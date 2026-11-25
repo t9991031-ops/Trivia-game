@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classroom Trivia Game</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --text: #1f2937;
+      --correct: #10b981;
+      --incorrect: #ef4444;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* Scoreboard styling */
+    .scoreboard {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    
+    .player-card {
+      display: flex;
+      flex-direction: row;       /* Lines players up in a horizontal row */
+      justify-content: space-between; /* Spreads them out evenly from edge to edge */
+      align-items: center;       /* Centers them vertically */
+      gap: 15px;                 /* Sets a minimum guaranteed gap between items */
+      padding: 20px;
+      /* font-size:20px; */
+    }
+
+    /* 2. Optional: Style the individual player boxes */
+    .player-item {
+      background-color: #f0f0f0;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+      
+      flex: 1;                       /* Forces all player elements to be the exact same width */
+    }
+      .player-item-active{
+          background-color: #008000;
+          color: #FFFFFF;
+          padding: 20px 30px;
+          font-size: 20px;
+          font-weight: bold;
+          border-radius: 5px;
+          text-align: center;
+          flex: 1;
+      }
+
+    .player-card.active {
+      border-color: var(--primary);
+      border-color: var(--primary);
+      transform: scale(1.05);
+    }
+
+    .player-name {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+    }
+
+    .player-score {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    /* Question Screen */
+    .game-card {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      color: #6b7280;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 10px;
+    }
+
+    .question-text {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 25px;
+      line-height: 1.4;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+      .player-amt-grid{
+          display:flex;
+          gap: 10px;
+      }
+
+    .option-btn {
+      background: #f9fafb;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 15px 20px;
+      text-align: left;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+
+    .option-btn:hover {
+      background: #f3f4f6;
+      border-color: #d1d5db;
+    }
+
+    .option-btn.selected-correct {
+      background-color: var(--correct);
+      color: white;
+      border-color: var(--correct);
+    }
+
+    .option-btn.selected-incorrect {
+      background-color: var(--incorrect);
+      color: white;
+      border-color: var(--incorrect);
+    }
+    .next-btn{
+        background: #00b4d8;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 15px 20px;
+        text-align: left;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        width: 100%;
+    }
+    .next-btn: hover{
+        background: #f3f4f6;
+        border-color: #d1d5db;
+    }
+      .next-btn-area{
+          display: flex;
+      }
+      .end-btn{
+          background: #ee4b2b;
+          border: 2px solid #e5e7eb;
+          border-radius: 8px;
+          padding: 15px 20px;
+          text-align: center;
+          font-size: 1.1rem;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          width: 100%
+      }
+      .end-btn: hover{
+          background: #fa003f;
+          border-color: #d1d5db;
+      }
+      .end-btn-active{
+          border-color: #228B22;
+          font-size: 1.2rem;
+      }
+
+    /* Results Screen */
+    .hidden {
+      display: none !important;
+    }
+
+    .results-card {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .winner-banner {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .restart-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .restart-btn:hover {
+      background: var(--primary-hover);
+    }
+  </style>
+</head>
+
+
+<body>
+    <div class="container">
+        <!-- <h1 class="header">TRIVIA GAME!!!</h1> -->
+        <div class="game-card" id="game-card">
+            
+            <div id= "player-card" class="player-card"></div>
+            <!-- <span id="question-number"> Question 1 of 10</span> -->
+            <!-- <span id="turn-indicator">Waiting...</span> -->
+            <div class="player-card" id="result-area">
+                <h1 id="result-text">Player select ⇨</h1>
+                <div id="player-amt" class="player-amt-grid"></div>
+                <div id="next-button-area" class="next-btn-area"></div>
+            </div>
+            
+        </div>
+
+        <div class="question-text" id="question-text">
+            1. プレイヤーの人数を選んでください。<br>
+            2. スコアは画面上部に表示されます。じゃんけんをして、順番を決めましょう。<br>
+            3. 各プレイヤーにそれぞれ質問が出題されます。一番多くのポイントを獲得することを目指してください。<br>
+            4. 回答が終わったら、タブレットを次のプレイヤーに渡してください。次のプレイヤーは「次へ（next）」ボタンを押してください。<br>
+            5. 5問目では、先生のところへ行って話をする必要があります。先生が忙しい場合は、一時停止（pause）しても構いません。<br>
+            6. When you're ready, press "start!" Good luck!
+        </div>
+
+        <div class="options-grid" id="options-grid">
+            
+        </div>
+        
+    </div>
+
+    <script>
+        
+        const PLAYERS = [
+            {name: "☀Sun",score: 0},
+            {name: "🌙Moon",score: 0},
+            {name: "⭐Star",score: 0},
+            {name: "🍁Leaf",score: 0},
+            {name: "🔥Fire",score: 0},
+        ];
+
+        const QUESTIONS = [
+            // FIRST SET OF QUESTIONS
+            [
+                {
+                    question: "1. どうやって",
+                    options: {A: "what", B: "how", C: "when", D: "where"},
+                    answer: "B",
+                    // pausable: true
+                },
+                {
+                    question: "1. いつ",
+                    options: {A: "who", B: "how", C: "what", D: "when"},
+                    answer: "D"
+                },
+                {
+                    question: "1. 何",
+                    options: {A: "what", B: "how", C: "where", D: "why"},
+                    answer: "A"
+                },
+                {
+                    question: "1. なぜ",
+                    options: {A: "how", B: "what", C: "why", D: "where"},
+                    answer: "C"
+                },
+                {
+                    question: "1. どこ",
+                    options: {A: "where", B: "when", C: "how", D: "why"},
+                    answer: "A"
+                }
+            ],
+            //SECOND SET OF QUESTIONS (FIND THE ERROR 
+            [
+                {
+                    question: "2. I don't know where to buy food. (日本語で)",
+                    options: {
+                        A: "食べ物をどうやって買えばいいのかわかりません。",
+                        B: "どこで食料を買えばいいのか分かりません。",
+                        C: "いつ食料を買えばいいのか分かりません。",
+                        D: "食べ物を何買えばいいのかわかりません。。"
+                    },
+                    answer: "B"
+                },
+                {
+                    question: "2. She doesn't know how to read. (日本語で)",
+                    options: {
+                        A: "彼女は読み方を知っている。",
+                        B: "彼女はどこで読めばいいかを知っている。",
+                        C: "彼女は読み方を知らない。",
+                        D: "彼女はいつ本を読めばよいのかわからない。"
+                    },
+                    answer: "C"
+                },
+                {
+                    question: "2. He knows where to find good food. (日本語で)",
+                    options: {
+                        A: "彼は美味しい料理の作り方を知っている。",
+                        B: "彼は食べ物の食べ方を知らない。",
+                        C: "彼はいつ食事をすべきかを知っている。",
+                        D: "彼はどこでおいしい食べ物を見つけられるかを知っている。"
+                    },
+                    answer: "D"
+                },
+                {
+                    question: "2. She doesn't know how to cook anything. (日本語で)",
+                    options: {
+                        A: "彼女は何も料理の仕方がわからない。",
+                        B: "彼女はあらゆる料理の作り方を知っている。",
+                        C: "彼女は何を作ればいいのかわからない。",
+                        D: "彼女は、なぜ料理をするのかがわかっていない。"
+                    },
+                    answer: "A"
+                },
+                {
+                    question: "2. You always know what to do.  (日本語で)",
+                    options: {
+                        A: "明日何をすべきか、分かっているはずだ。",
+                        B: "どうすればいいのか、全くわからない。",
+                        C: "どうすべきか、わかっている時がある。",
+                        D: "あなたはいつも、何をすべきか分かっている。"
+                    },
+                    answer: "D"
+                }
+            ],
+            //THIRD SET OF QUESTIONS FIND THE ERROR?
+            [
+                {
+                    question: "3. I doesn't know what to eat. エラーは何ですか？",
+                    options: {
+                        A: "I",
+                        B: "doesn't",
+                        C: "know.",
+                        D: "what.",
+                        E: "eat."
+                    },
+                    answer: "B"
+                },
+                {
+                    question: "3. He know how to cook delicious food. エラーは何ですか？",
+                    options: {
+                        A: "food",
+                        B: "how",
+                        C: "know",
+                        D: "delicious",
+                        E: "He"
+                    },
+                    answer: "C"
+                },
+                {
+                    question: "3. She doesn't know what to go. エラーは何ですか？",
+                    options: {
+                        A: "She",
+                        B: "know",
+                        C: "doesn't",
+                        D: "go",
+                        E: "what"
+                    },
+                    answer: "E"
+                },
+                {
+                    question: "3. You always know what to buys. エラーは何ですか？",
+                    options: {
+                        A: "always",
+                        B: "buys",
+                        C: "know",
+                        D: "You",
+                        E: "what"
+                    },
+                    answer: "B"
+                },
+                {
+                    question: "3. I knows where to get off the bus. エラーは何ですか？",
+                    options: {
+                        A: "bus",
+                        B: "get",
+                        C: "knows",
+                        D: "I",
+                        E: "off"
+                    },
+                    answer: "C"
+                }
+            ],
+            //FOURTH SET OF QUESTIONS
+            [
+                {
+                    question: "4. I practiced how to ______ to people. 最も適切な回答を選択してください",
+                    options: {
+                        A: "watch",
+                        B: "eat",
+                        C: "speak",
+                        D: "walk"
+                    },
+                    answer: "C"
+                },
+                {
+                    question: "4. I studied how to ____ the computer.最も適切な回答を選択してください",
+                    options: {
+                        A: "using",
+                        B: "use",
+                        C: "used",
+                        D: "uses"
+                    },
+                    answer: "B"
+                },
+                {
+                    question: "4. She will learn how to _____.最も適切な回答を選択してください",
+                    options: {
+                        A: "cooking",
+                        B: "cooks",
+                        C: "cooked",
+                        D: "cook"
+                    },
+                    answer: "D"
+                },
+                {
+                    question: "4. He learned how to ______ English quickly.",
+                    options: {
+                        A: "watch",
+                        B: "drink",
+                        C: "speak",
+                        D: "give"
+                    },
+                    answer: "C"
+                },
+                {
+                    question: "4. I _________ how to drive everyday.",
+                    options: {
+                        A: "walked",
+                        B: "practiced",
+                        C: "used",
+                        D: "talked"
+                    },
+                    answer: "B"
+                }
+            ],
+            //FIFTH SET OF QUESTIONS
+            [
+                {
+                    question: "5. 先生のところに行ってこう言って 'I know how to cook good food.'",
+                    options: {
+                        A: "What is the good food?",
+                        B: "What food can you cook the best?",
+                        C: "What food can you cook?",
+                        D: "What is your favorite?"
+                    },
+                    answer: "C",
+                    pausable: true
+                },
+                {
+                    question: "5. 先生のところに行ってこう言って 'I don't know how to use this computer.'",
+                    options: {
+                        A: "Let me help.",
+                        B: "Let me tell you how.",
+                        C: "Let me see what I can do.",
+                        D: "Let me try to help."
+                    },
+                    answer: "A",
+                    pausable: true
+                },
+                {
+                    question: "5. 先生のところに行ってこう言って 'I know where to find the supermarket.'",
+                    options: {
+                        A: "Where. Tell me where.",
+                        B: "Where is the supermarket?",
+                        C: "Where did you learn about it?",
+                        D: "Where is it?"
+                    },
+                    answer: "D",
+                    pausable: true
+                },
+                {
+                    question: "5. 先生のところに行ってこう言って 'I don't know where to go.'",
+                    options: {
+                        A: "I'm sorry to hear that.",
+                        B: "I'm sorry but I don't know either.",
+                        C: "I'm sorry but I can't help.",
+                        D: "I'm sorry about that."
+                    },
+                    answer: "A",
+                    pausable: true
+                },
+                {
+                    question: "5. 先生のところに行ってこう言って 'I don't know what to study for the test.'",
+                    options: {
+                        A: "I think you must study page fifty.",
+                        B: "I think you have to study page fifty.",
+                        C: "I think you should study page fifty, maybe.",
+                        D: "I think you should study a page."
+                    },
+                    answer: "C",
+                    pausable: true
+                }
+            ],
+            // SIXTH SET OF QUESTIONS
+            // [
+            //     {
+            //         question: "5. 先生のところに行ってこう言って 'I know how to cook good food.'",
+            //         options: {
+            //             A: "What is the good food?",
+            //             B: "What food can you cook the best?",
+            //             C: "What food can you cook?",
+            //             D: "What is your favorite?"
+            //         },
+            //         answer: "C",
+            //         pausable: true
+            //     },
+            //     {
+            //         question: "5. 先生のところに行ってこう言って 'I don't know how to use this computer.'",
+            //         options: {
+            //             A: "Let me help.",
+            //             B: "Let me tell you how.",
+            //             C: "Let me see what I can do.",
+            //             D: "Let me try to help."
+            //         },
+            //         answer: "A",
+            //         pausable: true
+            //     },
+            //     {
+            //         question: "5. 先生のところに行ってこう言って 'I know where to find the supermarket.'",
+            //         options: {
+            //             A: "Where. Tell me where.",
+            //             B: "Where is the supermarket?",
+            //             C: "Where did you learn about it?",
+            //             D: "Where is it?"
+            //         },
+            //         answer: "D",
+            //         pausable: true
+            //     },
+            //     {
+            //         question: "5. 先生のところに行ってこう言って 'I don't know where to go.'",
+            //         options: {
+            //             A: "I'm sorry to hear that.",
+            //             B: "I'm sorry but I don't know either.",
+            //             C: "I'm sorry but I can't help.",
+            //             D: "I'm sorry about that."
+            //         },
+            //         answer: "A",
+            //         pausable: true
+            //     },
+            //     {
+            //         question: "5. 先生のところに行ってこう言って 'I don't know what to study for the test.'",
+            //         options: {
+            //             A: "I think you must study page fifty.",
+            //             B: "I think you have to study page fifty.",
+            //             C: "I think you should study page fifty, maybe.",
+            //             D: "I think you should study a page."
+            //         },
+            //         answer: "C",
+            //         pausable: true
+            //     }
+            // ],
+        ];
+
+        // VARIABLES AND ELEMENTS //
+        const gameCard = document.getElementById("game-card");
+        const optionsGrid = document.getElementById("options-grid");
+        const resultText = document.getElementById("result-text");
+        const nextBtnArea = document.getElementById("next-button-area");
+        const questionText = document.getElementById("question-text");
+        const playerCard = document.getElementById("player-card");
+        const playerAmtEl = document.getElementById("player-amt");
+        const timerText = document.createElement("h2");
+
+        let index = 0; //FOR QUESTIONS
+        let index2 = 0;
+        let playerAmt = 4;
+
+        const defaultTime = 60;
+        const countdownTime = 3;
+
+        // const correctAudio = new Audio("correct.wav");
+        // const wrongAudio = new Audio("wrong.wav");
+        
+        let timeLeft = defaultTime;
+        let timerId = null;
+
+        const points = 10;
+        
+    
+        //FUNCTIONS//
+        
+        function initGame() {
+            addPlayers(4);
+            getPlayerAmt();
+        }
+        
+        function addPlayers(numberOfPlayers) {
+            // Use for...of with .entries() so 'break' works
+            for (const [index, player] of PLAYERS.entries()) {
+                if (index >= numberOfPlayers) break;
+        
+                const playerItem = document.createElement("div");
+                playerItem.classList.add("player-item");
+                playerItem.id = `player-id-${player.name}`;
+                playerItem.textContent = `${player.name}: ${player.score}`;
+                playerCard.appendChild(playerItem);
+            }
+        }
+        
+        function getPlayerAmt() {
+            const playerOptions = [4,5]; // Added 'const' so it isn't a global variable
+            
+            playerOptions.forEach((playerOption) => {
+                const button = document.createElement("button");
+                button.textContent = `${playerOption}`;
+                button.classList.add("end-btn");
+                playerAmtEl.appendChild(button);
+        
+                button.addEventListener("click", () => {
+                    playerCard.replaceChildren();
+                    playerAmtEl.replaceChildren();
+                    nextBtnArea.replaceChildren();
+                    button.classList.toggle("end-btn-active");
+                    addPlayers(playerOption); // Pass the chosen number forward when clicked
+                    addStartBtn();
+                    playerAmt = playerOption;
+                });
+            });
+        }
+
+        function addStartBtn(){
+            getPlayerAmt();
+            
+            const startButton = document.createElement("button");
+                startButton.classList.add("next-btn");
+                startButton.textContent = "START";
+                nextBtnArea.appendChild(startButton);
+        
+                startButton.addEventListener("click", () => {
+                    playerAmtEl.replaceChildren();
+                    nextBtnArea.replaceChildren();
+                    resultText.textContent = "COUNTDOWN";
+                    startTimer(countdownTime, () => {
+                       
+                        displayOptions();
+                        startTimer(defaultTime, () => {
+                            showAnswerWhenTimeUp();
+                            showNextButton();
+                        });
+                    });
+                });
+            }
+
+        function displayOptions(){
+            questionText.textContent = "";
+            optionsGrid.innerHTML = ""; 
+            
+            // SHOW QUESTION
+
+            const currentQuestion = QUESTIONS[index2][index].question;
+            resultText.textContent = `${currentQuestion}`;
+            
+            highlightActivePlayer(index);
+            
+            // startTimer();
+
+            // PAUSE AND RESTART SECTION:::
+
+            if (QUESTIONS[index2][index].pausable){
+                const pauseBtn = document.createElement("button");
+                pauseBtn.textContent = "PAUSE";
+                pauseBtn.classList.add("option-btn");
+                // pauseBtn.id = 100;
+                nextBtnArea.appendChild(pauseBtn);
+                pauseBtn.addEventListener("click", ()=>{
+                    startBtn.disabled = false;
+                    pauseBtn.enabled = true;
+                    // nextBtnArea.appendChild(startBtn);
+                    stopTimer();
+                    hideQuestions();
+                });
+                const startBtn = document.createElement("button");
+                startBtn.disabled = true;
+                // startBtn.id = 100;
+                startBtn.textContent = "START";
+                startBtn.classList.add("option-btn");
+                nextBtnArea.appendChild(startBtn);
+                startBtn.addEventListener("click", ()=>{
+                    unHideQuestions();
+                    startBtn.disabled = true;
+                    pauseBtn.enabled = false;
+                    
+                    startTimer(timeLeft, ()=>{
+                        nextBtnArea.textContent = "";
+                        showAnswerWhenTimeUp();
+                        showNextButton();
+                   }); 
+                });
+            }
+            createAnswerButtons();
+        }
+        
+        function showNextButton() {
+            nextBtnArea.textContent = "";
+            const isEnd = (index2+1 >= QUESTIONS.length) && (index+1 >= playerAmt);
+            const btn = document.createElement("button");
+
+            if (isEnd) {
+                btn.classList.add("end-btn");
+                btn.textContent = "FINISH";
+                btn.addEventListener("click", () => {
+                    btn.remove();
+                    endGame();
+                });
+            } else {
+                btn.classList.add("next-btn");
+                btn.textContent = "NEXT";
+                btn.addEventListener("click", () => {
+                    index += 1; // Increment only when clicked
+                    if (index >= playerAmt){
+                        index = 0;
+                        index2 += 1;
+                    }
+                    btn.remove();
+                    resultText.textContent = "COUNTDOWN";
+                    startTimer(countdownTime, () => {
+                        resetTimer();
+                        displayOptions();
+                        startTimer(defaultTime, () => {
+                            showAnswerWhenTimeUp();
+                        });
+                    });
+                });
+            }
+        
+            nextBtnArea.appendChild(btn);
+        }
+
+        function createAnswerButtons(){
+            Object.entries(QUESTIONS[index2][index].options).forEach(([key,value]) => {
+                const button = document.createElement("button");
+                button.textContent = `${key}. ${value}`;
+                
+                button.addEventListener("click",()=>{
+                    nextBtnArea.replaceChildren();
+                    stopTimer();
+                    showNextButton();
+
+                    const allButtons = optionsGrid.querySelectorAll(".option-btn");
+                    allButtons.forEach(btn => btn.disabled = true);
+
+                    const isCorrect = key === QUESTIONS[index2][index].answer;
+                    
+                    // CHECKS ANSWER //
+                    if (isCorrect){
+                        resultText.textContent = "👍Correct";
+                        // correctAudio.play();
+                        button.style.backgroundColor = "green";
+                        button.style.color = "white";
+
+                        // AWARD POINTS
+                        awardPoints(index);
+                    }
+                    else{
+                        resultText.textContent = "😥Incorrect";
+                        // wrongAudio.play();
+
+                        allButtons.forEach(btn => {
+                            if (btn.textContent.startsWith(QUESTIONS[index2][index].answer)){
+                                btn.style.backgroundColor = "green";
+                                btn.style.color = "white";
+                            }else{
+                                btn.style.backgroundColor = "red";
+                            }
+                        });
+                    }
+                    
+                });
+                
+                button.classList.add("option-btn"); 
+                optionsGrid.appendChild(button);
+                
+            });
+        }
+
+
+        function hideQuestions(){
+            optionsGrid.innerHTML = ""; 
+            resultText.textContent = "PAUSED 一時停止　⏸";
+        }
+
+        function unHideQuestions(){
+            const currentQuestion = QUESTIONS[index2][index].question;
+            resultText.textContent = `${currentQuestion}`;
+            createAnswerButtons();
+        }
+
+        function highlightActivePlayer(index){
+
+            document.querySelectorAll(".player-item-active").forEach(el => {
+               el.classList.remove("player-item-active"); 
+            });
+            
+            const activePlayerIndex = index % PLAYERS.length;
+            const activePlayer = PLAYERS[activePlayerIndex];
+            const activePlayerItem = document.getElementById(`player-id-${activePlayer.name}`);
+
+            if (activePlayerItem){
+                activePlayerItem.classList.add("player-item-active");
+            }
+        }
+
+        function awardPoints(index){
+            
+            const activePlayerIndex = index % PLAYERS.length;
+            const activePlayer = PLAYERS[activePlayerIndex];
+            PLAYERS[activePlayerIndex].score += points * timeLeft;
+            
+            const activePlayerItem = document.getElementById(`player-id-${activePlayer.name}`);
+
+            if (activePlayerItem){
+                activePlayerItem.textContent = `${PLAYERS[activePlayerIndex].name}: ${PLAYERS[activePlayerIndex].score}`;
+            }else{
+                console.error("COULDN'T FIND THING");
+            }
+        }
+
+        function showAnswerWhenTimeUp(){
+            resultText.textContent = "⌛TIME IS UP! 次のプレイヤーにパスしてから「次へ」を押してください。";
+            const allButtons = optionsGrid.querySelectorAll(".option-btn");
+            allButtons.forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent.startsWith(QUESTIONS[index2][index].answer)){
+                    btn.style.backgroundColor = "green";
+                    btn.style.color = "white";
+                }else{
+                    btn.style.backgroundColor = "red";
+                }
+            });
+            showNextButton();
+        }
+        function startTimer(seconds, onComplete){
+            if (timerId !== null)return;
+            
+            nextBtnArea.appendChild(timerText);
+            
+            timeLeft = seconds;
+            timerText.textContent = `⏲ ${timeLeft}`;
+            updateDisplay(timeLeft);
+            timerId = setInterval(()=> {
+                timeLeft--;
+                timerText.textContent = `⏲ ${timeLeft}`;
+                updateDisplay(timeLeft);
+                if (timeLeft <= 0){
+                    resetTimer();
+                    updateDisplay(timeLeft);
+                    if (onComplete)onComplete();
+                }
+            },1000);
+        }
+
+        function stopTimer(){
+            clearInterval(timerId);
+            updateDisplay(timeLeft);
+            timerId = null;
+        }
+        
+
+        function resetTimer(){
+            stopTimer();
+            timeLeft = defaultTime;
+            updateDisplay(timeLeft);
+        }   
+        function updateDisplay(timeLeft){
+            timerText.textContent = `⏲ ${timeLeft}`;
+        }
+
+        function endGame(){
+            // FIND WINNER
+            startTimer(countdownTime, () => {
+                optionsGrid.innerHTML = "";
+                questionText.textContent = "";
+                questionText.textContent = "FINISHED!";
+    
+                const winner = PLAYERS.reduce((highest, current)=>{
+                    return current.score > highest.score ? current : highest;
+                });
+                
+                const winnerPlayerItem = document.getElementById(`player-id-${winner.name}`);
+                document.querySelectorAll(".player-item-active").forEach(el => {    
+                    el.classList.remove("player-item-active"); 
+                });
+                
+                winnerPlayerItem.classList.add("player-item-active");
+    
+                resultText.textContent = `🏆Winner is: ${winner.name} (${winner.score})`;
+            });            
+        }
+
+        initGame();
+    </script>
+    
+</body>
+</html>
+
+
+
