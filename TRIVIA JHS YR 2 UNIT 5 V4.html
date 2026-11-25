@@ -601,8 +601,8 @@
         const defaultTime = 60;
         const countdownTime = 3;
 
-        // const correctAudio = new Audio("correct.wav");
-        // const wrongAudio = new Audio("wrong.wav");
+        const correctAudio = new Audio("correct.wav");
+        const wrongAudio = new Audio("wrong.wav");
         
         let timeLeft = defaultTime;
         let timerId = null;
@@ -777,7 +777,7 @@
                     // CHECKS ANSWER //
                     if (isCorrect){
                         resultText.textContent = "👍Correct";
-                        // correctAudio.play();
+                        correctAudio.play();
                         button.style.backgroundColor = "green";
                         button.style.color = "white";
 
@@ -786,7 +786,7 @@
                     }
                     else{
                         resultText.textContent = "😥Incorrect";
-                        // wrongAudio.play();
+                        wrongAudio.play();
 
                         allButtons.forEach(btn => {
                             if (btn.textContent.startsWith(QUESTIONS[index2][index].answer)){
