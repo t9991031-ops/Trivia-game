@@ -355,62 +355,47 @@
                     answer: "D"
                 }
             ],
-            //THIRD SET OF QUESTIONS FIND THE ERROR?
+            //THIRD SET OF QUESTIONS Write on the board?
             [
                 {
-                    question: "3. I doesn't know what to eat. エラーは何ですか？",
+                    question: "3. この文をホワイトボードに書いてください。I can tell you how to make friends.",
                     options: {
-                        A: "I",
-                        B: "doesn't",
-                        C: "know.",
-                        D: "what.",
-                        E: "eat."
+                        A: "1",B: "2",C: "3",D: "4",E: "5",
+                        F: "6",G: "7",H: "8",I: "9",J: "10"
+                    },
+                    answer: "G"
+                },
+                {
+                    question: "3. この文をホワイトボードに書いてください。I can show you how to win this game.",
+                    options: {
+                        A: "1",B: "2",C: "3",D: "4",E: "5",
+                        F: "6",G: "7",H: "8",I: "9",J: "10"
                     },
                     answer: "B"
                 },
                 {
-                    question: "3. He know how to cook delicious food. エラーは何ですか？",
+                    question: "3. この文をホワイトボードに書いてください。I can teach you how to pass the exam.",
                     options: {
-                        A: "food",
-                        B: "how",
-                        C: "know",
-                        D: "delicious",
-                        E: "He"
+                        A: "1",B: "2",C: "3",D: "4",E: "5",
+                        F: "6",G: "7",H: "8",I: "9",J: "10"
                     },
-                    answer: "C"
+                    answer: "J"
                 },
                 {
-                    question: "3. She doesn't know what to go. エラーは何ですか？",
+                    question: "3. この文をホワイトボードに書いてください。I can show you how to turn on the computer.",
                     options: {
-                        A: "She",
-                        B: "know",
-                        C: "doesn't",
-                        D: "go",
-                        E: "what"
+                        A: "1",B: "2",C: "3",D: "4",E: "5",
+                        F: "6",G: "7",H: "8",I: "9",J: "10"
                     },
                     answer: "E"
                 },
                 {
-                    question: "3. You always know what to buys. エラーは何ですか？",
+                    question: "3. この文をホワイトボードに書いてください。I can tell you how to get to the station.",
                     options: {
-                        A: "always",
-                        B: "buys",
-                        C: "know",
-                        D: "You",
-                        E: "what"
+                        A: "1",B: "2",C: "3",D: "4",E: "5",
+                        F: "6",G: "7",H: "8",I: "9",J: "10"
                     },
-                    answer: "B"
-                },
-                {
-                    question: "3. I knows where to get off the bus. エラーは何ですか？",
-                    options: {
-                        A: "bus",
-                        B: "get",
-                        C: "knows",
-                        D: "I",
-                        E: "off"
-                    },
-                    answer: "C"
+                    answer: "D"
                 }
             ],
             //FOURTH SET OF QUESTIONS
@@ -482,10 +467,10 @@
                 {
                     question: "5. 先生のところに行ってこう言って 'I don't know how to use this computer.'",
                     options: {
-                        A: "Let me help.",
-                        B: "Let me tell you how.",
-                        C: "Let me see what I can do.",
-                        D: "Let me try to help."
+                        A: "I can tell you how to use it.",
+                        B: "I can show you what to do.",
+                        C: "I can teach you how to use it.",
+                        D: "I can tell you what to do."
                     },
                     answer: "A",
                     pausable: true
@@ -517,7 +502,7 @@
                     options: {
                         A: "I think you must study page fifty.",
                         B: "I think you have to study page fifty.",
-                        C: "I think you should study page fifty, maybe.",
+                        C: "I think you should study page fifty.",
                         D: "I think you should study a page."
                     },
                     answer: "C",
@@ -527,12 +512,12 @@
             // SIXTH SET OF QUESTIONS
             // [
             //     {
-            //         question: "5. 先生のところに行ってこう言って 'I know how to cook good food.'",
+            //         question: "6. Look at #5 on the tv. Choose the appropriate sentence.",
             //         options: {
-            //             A: "What is the good food?",
-            //             B: "What food can you cook the best?",
-            //             C: "What food can you cook?",
-            //             D: "What is your favorite?"
+            //             A: "I can show you how to use this scissors.",
+            //             B: "I can show you where to find good food.",
+            //             C: "I can tell you what to see in Tokyo.",
+            //             D: "I can tell you how to use this phone."
             //         },
             //         answer: "C",
             //         pausable: true
@@ -594,15 +579,15 @@
         const playerAmtEl = document.getElementById("player-amt");
         const timerText = document.createElement("h2");
 
-        let index = 0; //FOR QUESTIONS
+        let index = 0; //FOR QUESTIONS AND HIGHLIGHTING ACTIVE PLAYER
         let index2 = 0;
         let playerAmt = 4;
 
         const defaultTime = 60;
         const countdownTime = 3;
 
-        const correctAudio = new Audio("correct.wav");
-        const wrongAudio = new Audio("wrong.wav");
+        // const correctAudio = new Audio("correct.wav");
+        // const wrongAudio = new Audio("wrong.wav");
         
         let timeLeft = defaultTime;
         let timerId = null;
@@ -777,16 +762,16 @@
                     // CHECKS ANSWER //
                     if (isCorrect){
                         resultText.textContent = "👍Correct";
-                        correctAudio.play();
+                        // correctAudio.play();
                         button.style.backgroundColor = "green";
                         button.style.color = "white";
 
                         // AWARD POINTS
-                        awardPoints(index);
+                        awardPoints();
                     }
                     else{
                         resultText.textContent = "😥Incorrect";
-                        wrongAudio.play();
+                        // wrongAudio.play();
 
                         allButtons.forEach(btn => {
                             if (btn.textContent.startsWith(QUESTIONS[index2][index].answer)){
@@ -824,8 +809,8 @@
                el.classList.remove("player-item-active"); 
             });
             
-            const activePlayerIndex = index % PLAYERS.length;
-            const activePlayer = PLAYERS[activePlayerIndex];
+            // const activePlayerIndex = index;
+            const activePlayer = PLAYERS[index];
             const activePlayerItem = document.getElementById(`player-id-${activePlayer.name}`);
 
             if (activePlayerItem){
@@ -833,16 +818,16 @@
             }
         }
 
-        function awardPoints(index){
+        function awardPoints(){
             
-            const activePlayerIndex = index % PLAYERS.length;
-            const activePlayer = PLAYERS[activePlayerIndex];
-            PLAYERS[activePlayerIndex].score += points * timeLeft;
+            // const activePlayerIndex = index % PLAYERS.length;
+            const activePlayer = PLAYERS[index];
+            PLAYERS[index].score += points * timeLeft;
             
             const activePlayerItem = document.getElementById(`player-id-${activePlayer.name}`);
 
             if (activePlayerItem){
-                activePlayerItem.textContent = `${PLAYERS[activePlayerIndex].name}: ${PLAYERS[activePlayerIndex].score}`;
+                activePlayerItem.textContent = `${PLAYERS[index].name}: ${PLAYERS[index].score}`;
             }else{
                 console.error("COULDN'T FIND THING");
             }
